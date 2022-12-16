@@ -26,33 +26,35 @@ namespace Space_Shooter
         private readonly int GameTickLength = 20;
         private int SafetyPeriod = 50;
         private int EnemySpawnRate = 50;
-        private int PlayerShipSpeed = 10;
         private int EnemyShipSpeed = 10;
         private int Score;
         private int HullStrength;
         private bool moveLeft;
         private bool moveRight;
 
+        PlayerShip playerShip;
+
         public MainWindow()
         {
             InitializeComponent();
-
+            SetupWindow();
+            playerShip = new() { Model = player };
             gameTimer.Interval = TimeSpan.FromMilliseconds(GameTickLength);
             gameTimer.Tick += GameLoop;
             gameTimer.Start();
             MyCanvas.Focus();
             Draw.DrawBackground(MyCanvas);
-            Draw.DrawPlayer(player);
+            Draw.DrawPlayer(playerShip);
         }
-        void DrawBackground()
+        private void SetupWindow()
         {
-            ImageBrush bg = new();
+            MinWidth = GlobalVariables.WindowWidth;
+            Width = GlobalVariables.WindowWidth;
+            MaxWidth = GlobalVariables.WindowWidth;
+            MinHeight = GlobalVariables.WindowHeight;
+            Height = GlobalVariables.WindowHeight;
+            MaxHeight = GlobalVariables.WindowHeight;
 
-            bg.ImageSource = new BitmapImage(new Uri(SpriteUri.Background, UriKind.Relative));
-            bg.TileMode = TileMode.Tile;
-            bg.Viewport = new Rect(0, 0, 0.15, 0.15);
-            bg.ViewportUnits = BrushMappingMode.RelativeToBoundingBox;
-            MyCanvas.Background = bg;
         }
         private void GameLoop(object sender, EventArgs e)
         {
@@ -74,20 +76,9 @@ namespace Space_Shooter
             {
                 moveRight = true;
             }
-            if (e.Key == Key.Space)
+            if(e.Key == Key.Space)
             {
-                Rectangle newBullet = new()
-                {
-                    Tag = "bullet",
-                    Height = 20,
-                    Width = 5,
-                    Fill = Brushes.White,
-                    Stroke = Brushes.Red
-                };
-                Canvas.SetLeft(newBullet, Canvas.GetLeft(player) + player.Width / 2);
-                Canvas.SetTop(newBullet, Canvas.GetTop(player) - newBullet.Height);
-
-                MyCanvas.Children.Add(newBullet);
+                playerShip.Shoot(MyCanvas);
             }
         }
         private void OnKeyUp(object sender, KeyEventArgs e)
@@ -116,7 +107,7 @@ namespace Space_Shooter
             };
 
             Canvas.SetTop(newEnemy, -100);
-            Canvas.SetLeft(newEnemy, rand.Next(30, 430));
+            Canvas.SetLeft(newEnemy, rand.Next(0, (int)(GlobalVariables.WindowWidth-newEnemy.Width)));
 
             MyCanvas.Children.Add(newEnemy);
         }
@@ -144,28 +135,27 @@ namespace Space_Shooter
                 if ((string)x.Tag == "enemy")
                 {
                     Canvas.SetTop(x, Canvas.GetTop(x) + EnemyShipSpeed);
-                    if (Canvas.GetTop(x) > 700)
+                    if (Canvas.GetTop(x) > GlobalVariables.WindowHeight)
                     {
                         itemRemover.Add(x);
-                        HullStrength -= 100;
+                        HullStrength -= 10;
                     }
                 }
             }
         }
-        private void CheckForEnemyHits(Rectangle x)
+        private void CheckForEnemyHits(Rectangle bullet)
         {
-            //enemy hit logic
-            Rect bulletHitBox = new(Canvas.GetLeft(x), Canvas.GetTop(x), x.Width, x.Height);
-            foreach (var y in MyCanvas.Children.OfType<Rectangle>())
+            Rect bulletHitBox = new(Canvas.GetLeft(bullet), Canvas.GetTop(bullet), bullet.Width, bullet.Height);
+            foreach (var enemy in MyCanvas.Children.OfType<Rectangle>())
             {
-                if ((string)y.Tag == "enemy")
+                if ((string)enemy.Tag == "enemy")
                 {
-                    Rect enemyHit = new(Canvas.GetLeft(y), Canvas.GetTop(y), y.Width, y.Height);
+                    Rect enemyHit = new(Canvas.GetLeft(enemy), Canvas.GetTop(enemy), enemy.Width, enemy.Height);
 
                     if (bulletHitBox.IntersectsWith(enemyHit))
                     {
-                        itemRemover.Add(x);
-                        itemRemover.Add(y);
+                        itemRemover.Add(bullet);
+                        itemRemover.Add(enemy);
                         Score += 10;
                     }
                 }
@@ -186,30 +176,31 @@ namespace Space_Shooter
         }
         private void AttemptToMovePlayer()
         {
-            if (moveLeft && IsThereSpaceLeft())
+            if (moveLeft)
             {
-                MovePlayerLeft();
+                playerShip.Move(1);
             }
-            if (moveRight && IsThereSpaceRight())
+            if (moveRight)
             {
-                MovePlayerRight();
+                playerShip.Move(2);
             }
         }
+        /*
         private void MovePlayerLeft()
         {
-            Canvas.SetLeft(player, Canvas.GetLeft(player) - PlayerShipSpeed);
+            Canvas.SetLeft(playerShip.Model, Canvas.GetLeft(playerShip.Model) - PlayerShipSpeed);
         }
         private void MovePlayerRight()
         {
-            Canvas.SetLeft(player, Canvas.GetLeft(player) + PlayerShipSpeed);
+            Canvas.SetLeft(playerShip.Model, Canvas.GetLeft(playerShip.Model) + PlayerShipSpeed);
         }
         private bool IsThereSpaceLeft()
         {
-            return (Canvas.GetLeft(player) > PlayerShipSpeed);
+            return (Canvas.GetLeft(playerShip.Model) > PlayerShipSpeed);
         }
         private bool IsThereSpaceRight()
         {
-            return (Canvas.GetLeft(player) + 90 < Application.Current.MainWindow.Width);
-        }
+            return (Canvas.GetLeft(playerShip.Model) + playerShip.Model.Width < GlobalVariables.WindowWidth);
+        }*/
     }
 }

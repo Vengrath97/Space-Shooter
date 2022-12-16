@@ -13,12 +13,11 @@ namespace Space_Shooter
 {
     static class Draw
     {
-        public static void DrawPlayer(Rectangle player)
+        public static void DrawPlayer(PlayerShip player)
         {
             ImageBrush playerImage = new() { ImageSource = new BitmapImage(new Uri(SpriteUri.Player, UriKind.Relative)) };
-            player.Fill = playerImage;
+            player.Model.Fill = playerImage;
         }
-
         public static void DrawBackground(Canvas canvas)
         {
             ImageBrush bg = new();
