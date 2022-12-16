@@ -1,15 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Controls;
-using System.Windows.Media;
 using System.Windows.Shapes;
 
 namespace Space_Shooter
 {
-    class PlayerShip : IShip
+    class EnemyShip : IShip
     {
         public int HullStrength;
         public int CurrentHullStrength;
@@ -17,11 +13,12 @@ namespace Space_Shooter
         public Rectangle Model;
         private static List<Gun> Guns = new();
 
-        public PlayerShip(int hullStrength = -1, int speed = -1)
+        public EnemyShip(int hullStrength = 1, int speed = 10)
         {
-            HullStrength = (hullStrength == -1) ? GlobalVariables.PlayerHullStrength : hullStrength;
+            Random rand = new();
+            HullStrength = hullStrength;
             CurrentHullStrength = HullStrength;
-            Speed = (speed == -1) ? GlobalVariables.PlayerShipSpeed : speed;
+            Speed = speed;
             Guns.Add(new Laser());
             //Guns.Add(new DoubleLaser());
             //Guns.Add(new TripleLaser());
@@ -30,7 +27,7 @@ namespace Space_Shooter
         {
             foreach(Gun gun in Guns)
             {
-                gun.Fire(canvas, Model,false);
+                gun.Fire(canvas, Model,true);
             }
         }
 
@@ -40,37 +37,37 @@ namespace Space_Shooter
             {
                 case DirectionDictionary.Direction.Left:
                     if (IsThereSpaceLeft())
-                        MovePlayerLeft();
+                        moveLeft();
                     break;
                 case DirectionDictionary.Direction.Right:
                     if (IsThereSpaceRight())
-                        MovePlayerRight();
+                        moveRight();
                     break;
                 case DirectionDictionary.Direction.Up:
                     if (IsThereSpaceUp())
-                        MovePlayerUp();
+                        moveUp();
                     break;
                 case DirectionDictionary.Direction.Down:
                     if (IsThereSpaceDown())
-                        MovePlayerDown();
+                        moveDown();
                     break;
                 default:
                     break;
             }
         }
-        private void MovePlayerLeft()
+        private void moveLeft()
         {
             Canvas.SetLeft(Model, Canvas.GetLeft(Model) - this.Speed);
         }
-        private void MovePlayerRight()
+        private void moveRight()
         {
             Canvas.SetLeft(Model, Canvas.GetLeft(Model) + this.Speed);
         }
-        private void MovePlayerUp()
+        private void moveUp()
         {
             Canvas.SetTop(Model, Canvas.GetTop(Model) - this.Speed);
         }
-        private void MovePlayerDown()
+        private void moveDown()
         {
             Canvas.SetTop(Model, Canvas.GetTop(Model) + this.Speed);
         }
@@ -86,7 +83,7 @@ namespace Space_Shooter
         {
             return (Canvas.GetTop(Model) > 0 + this.Speed);
         }
-        private bool IsThereSpaceDown()
+        public bool IsThereSpaceDown()
         {
             return (Canvas.GetTop(Model) + Model.Width < GlobalVariables.WindowHeight + this.Speed);
         }
