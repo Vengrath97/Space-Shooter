@@ -19,6 +19,8 @@ namespace Space_Shooter
     public partial class MainWindow : Window
     {
         private readonly List<Rectangle> itemRemover = new();
+        public static List<Bullet> bullets = new();
+        public static List<Bullet> bulletRemover = new();
         private readonly DispatcherTimer gameTimer = new();
         private readonly Random rand = new();
 
@@ -27,12 +29,14 @@ namespace Space_Shooter
         private int SafetyPeriod = 50;
         private int EnemySpawnRate = 50;
         private int EnemyShipSpeed = 10;
-        private int Score;
-        private int HullStrength;
+
+        private int score;
+
         private bool moveLeft;
         private bool moveRight;
-
-        PlayerShip playerShip;
+        private bool moveUp;
+        private bool moveDown;
+        private readonly PlayerShip playerShip;
 
         public MainWindow()
         {
@@ -72,11 +76,19 @@ namespace Space_Shooter
             {
                 moveLeft = true;
             }
-            if(e.Key == Key.Right)
+            if (e.Key == Key.Right)
             {
                 moveRight = true;
             }
-            if(e.Key == Key.Space)
+            if (e.Key == Key.Up)
+            {
+                moveUp = true;
+            }
+            if (e.Key == Key.Down)
+            {
+                moveDown = true;
+            }
+            if (e.Key == Key.Space)
             {
                 playerShip.Shoot(MyCanvas);
             }
@@ -90,6 +102,14 @@ namespace Space_Shooter
             if (e.Key == Key.Right)
             {
                 moveRight = false;
+            }
+            if (e.Key == Key.Up)
+            {
+                moveUp = false;
+            }
+            if (e.Key == Key.Down)
+            {
+                moveDown = false;
             }
 
         }
@@ -117,28 +137,32 @@ namespace Space_Shooter
             {
                 MyCanvas.Children.Remove(item);
             }
+            foreach (Bullet item in bulletRemover)
+            {
+                bullets.Remove(item);
+            }
         }
         private void MoveObjects()
         {
+            foreach(Bullet bullet in bullets)
+            {
+                bullet.Move();
+                if (Canvas.GetTop(bullet.Model) < 0)
+                {
+                    itemRemover.Add(bullet.Model);
+                    bulletRemover.Add(bullet);
+                }
+                CheckForEnemyHits(bullet.Model);
+            }
             foreach (var x in MyCanvas.Children.OfType<Rectangle>())
             {
-                if ((string)x.Tag == "bullet")
-                {
-                    Canvas.SetTop(x, Canvas.GetTop(x) - 20);
-
-                    if (Canvas.GetTop(x) < 0)
-                    {
-                        itemRemover.Add(x);
-                    }
-                    CheckForEnemyHits(x);
-                }
                 if ((string)x.Tag == "enemy")
                 {
                     Canvas.SetTop(x, Canvas.GetTop(x) + EnemyShipSpeed);
                     if (Canvas.GetTop(x) > GlobalVariables.WindowHeight)
                     {
                         itemRemover.Add(x);
-                        HullStrength -= 10;
+                        playerShip.CurrentHullStrength -= GlobalVariables.HullDamageWhenEnemyEscapes;
                     }
                 }
             }
@@ -156,7 +180,7 @@ namespace Space_Shooter
                     {
                         itemRemover.Add(bullet);
                         itemRemover.Add(enemy);
-                        Score += 10;
+                        score += 10;
                     }
                 }
             }
@@ -171,18 +195,26 @@ namespace Space_Shooter
         }
         private void UpdateLabels()
         {
-            scoreText.Content = "Score: " + Score;
-            damageText.Content = "Hull: " + HullStrength;
+            scoreText.Content = "Score: " + score;
+            damageText.Content = "Hull: " + playerShip.CurrentHullStrength;
         }
         private void AttemptToMovePlayer()
         {
             if (moveLeft)
             {
-                playerShip.Move(1);
+                playerShip.Move(DirectionDictionary.Direction.Left);
             }
             if (moveRight)
             {
-                playerShip.Move(2);
+                playerShip.Move(DirectionDictionary.Direction.Right);
+            }
+            if (moveUp)
+            {
+                playerShip.Move(DirectionDictionary.Direction.Up);
+            }
+            if (moveDown)
+            {
+                playerShip.Move(DirectionDictionary.Direction.Down);
             }
         }
     }

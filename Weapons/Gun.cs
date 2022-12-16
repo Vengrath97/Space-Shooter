@@ -4,12 +4,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
+using System.Windows.Shapes;
 
 namespace Space_Shooter
 {
-    interface IShip
+    public class Gun
     {
-        void Shoot(Canvas canvas);
-        void Move(int direction);
+        public virtual void Fire(Canvas canvas, Rectangle model)
+        {
+
+        }
     }
 }
