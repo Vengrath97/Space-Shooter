@@ -41,8 +41,8 @@ namespace Space_Shooter
             gameTimer.Tick += GameLoop;
             gameTimer.Start();
             MyCanvas.Focus();
-            DrawBackground();
-            DrawPlayer();
+            Draw.DrawBackground(MyCanvas);
+            Draw.DrawPlayer(player);
         }
         void DrawBackground()
         {
@@ -53,14 +53,6 @@ namespace Space_Shooter
             bg.Viewport = new Rect(0, 0, 0.15, 0.15);
             bg.ViewportUnits = BrushMappingMode.RelativeToBoundingBox;
             MyCanvas.Background = bg;
-        }
-        void DrawPlayer()
-        {
-            ImageBrush playerImage = new()
-            {
-                ImageSource = new BitmapImage(new Uri(SpriteUri.Player, UriKind.Relative))
-            };
-            player.Fill = playerImage;
         }
         private void GameLoop(object sender, EventArgs e)
         {
@@ -113,26 +105,8 @@ namespace Space_Shooter
         private void MakeEnemies()
         {
             ImageBrush enemySprite = new();
-
-            switch (rand.Next(1, 5))
-            {
-                case 1:
-                    enemySprite.ImageSource = new BitmapImage(new Uri(SpriteUri.EnemyShip1, UriKind.Relative));
-                    break;
-                case 2:
-                    enemySprite.ImageSource = new BitmapImage(new Uri(SpriteUri.EnemyShip2, UriKind.Relative));
-                    break;
-                case 3:
-                    enemySprite.ImageSource = new BitmapImage(new Uri(SpriteUri.EnemyShip3, UriKind.Relative));
-                    break;
-                case 4:
-                    enemySprite.ImageSource = new BitmapImage(new Uri(SpriteUri.EnemyShip4, UriKind.Relative));
-                    break;
-                case 5:
-                    enemySprite.ImageSource = new BitmapImage(new Uri(SpriteUri.EnemyShip5, UriKind.Relative));
-                    break;
-            }
-
+            int EnemySprite = rand.Next(0, 5);
+            enemySprite.ImageSource = new BitmapImage(new Uri(SpriteUri.EnemyShipX[EnemySprite], UriKind.Relative));
             Rectangle newEnemy = new()
             {
                 Tag = "enemy",
