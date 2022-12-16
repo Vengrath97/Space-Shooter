@@ -22,9 +22,9 @@ namespace Space_Shooter
             HullStrength = (hullStrength == -1) ? GlobalVariables.PlayerHullStrength : hullStrength;
             CurrentHullStrength = HullStrength;
             Speed = (speed == -1) ? GlobalVariables.PlayerShipSpeed : speed;
-            //Guns.Add(new Laser());
+            Guns.Add(new Laser());
             //Guns.Add(new DoubleLaser());
-            Guns.Add(new TripleLaser());
+            //Guns.Add(new TripleLaser());
         }
         public void Shoot(Canvas canvas)
         {

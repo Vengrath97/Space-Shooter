@@ -68,7 +68,15 @@ namespace Space_Shooter
             AttemptToMovePlayer();
             MoveObjects();
             RemoveOutOfBounds();
+            if (playerShip.CurrentHullStrength < 1) GameOver();
 
+        }
+        private void GameOver()
+        {
+            gameTimer.Tick -= GameLoop;
+            scoreText.Content = "";
+            damageText.Content = "";
+            gameOverText.Content = $"Captain, you have survived \nfor a long time.\nYou have scored {score} points";
         }
         private void OnKeyDown(object sender, KeyEventArgs e)
         {

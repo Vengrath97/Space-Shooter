@@ -14,7 +14,7 @@ namespace Space_Shooter
         {
             for (int i = 0; i < 2; i++)
             {
-                Bullet newBullet = new((-3+6*i), -20, 10, 5);
+                Bullet newBullet = new((-3+6*i), -4, 10, 5);
                 Canvas.SetLeft(newBullet.Model, Canvas.GetLeft(model) + model.Width / 2);
                 Canvas.SetTop(newBullet.Model, Canvas.GetTop(model) - newBullet.Model.Height);
                 canvas.Children.Add(newBullet.Model);
