@@ -185,22 +185,5 @@ namespace Space_Shooter
                 playerShip.Move(2);
             }
         }
-        /*
-        private void MovePlayerLeft()
-        {
-            Canvas.SetLeft(playerShip.Model, Canvas.GetLeft(playerShip.Model) - PlayerShipSpeed);
-        }
-        private void MovePlayerRight()
-        {
-            Canvas.SetLeft(playerShip.Model, Canvas.GetLeft(playerShip.Model) + PlayerShipSpeed);
-        }
-        private bool IsThereSpaceLeft()
-        {
-            return (Canvas.GetLeft(playerShip.Model) > PlayerShipSpeed);
-        }
-        private bool IsThereSpaceRight()
-        {
-            return (Canvas.GetLeft(playerShip.Model) + playerShip.Model.Width < GlobalVariables.WindowWidth);
-        }*/
     }
 }
