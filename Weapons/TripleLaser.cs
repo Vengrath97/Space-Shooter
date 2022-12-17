@@ -16,13 +16,15 @@ namespace Space_Shooter
                 {
                     int xSpeed = -30 + i * -15;
                     int ySpeed = -20;
-                    if (isEnemy) ySpeed = ySpeed * -1;
-                    CreateBullet(canvas, model, xSpeed, ySpeed);
+                    if (isEnemy)
+                    {
+                        ySpeed = ySpeed * -1;
+                    }
+                    MainWindow.bullets.Add(CreateBullet(canvas, model, xSpeed, ySpeed));
                 }
                 heat = 0;
             }
             heat += 1;
         }
-
     }
 }

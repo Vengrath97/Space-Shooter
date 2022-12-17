@@ -22,15 +22,15 @@ namespace Space_Shooter
             HullStrength = (hullStrength == -1) ? GlobalVariables.PlayerHullStrength : hullStrength;
             CurrentHullStrength = HullStrength;
             Speed = (speed == -1) ? GlobalVariables.PlayerShipSpeed : speed;
-            //Guns.Add(new Laser());
-            Guns.Add(new DoubleLaser());
+            Guns.Add(new Laser());
+            //Guns.Add(new DoubleLaser());
             //Guns.Add(new TripleLaser());
         }
         public void Shoot(Canvas canvas)
         {
             foreach(Gun gun in Guns)
             {
-                gun.Fire(canvas, Model,false);
+                gun.Fire(canvas, Model, false);
             }
         }
 
