@@ -11,7 +11,7 @@ namespace Space_Shooter
         public int CurrentHullStrength;
         public int Speed;
         public Rectangle Model;
-        private static List<Gun> Guns = new();
+        private List<Gun> Guns = new();
 
         public EnemyShip(int hullStrength = 1, int speed = 10)
         {
@@ -19,8 +19,8 @@ namespace Space_Shooter
             HullStrength = hullStrength;
             CurrentHullStrength = HullStrength;
             Speed = speed;
-            Guns.Add(new Laser());
-            //Guns.Add(new DoubleLaser());
+            //Guns.Add(new Laser());
+            Guns.Add(new DoubleLaser());
             //Guns.Add(new TripleLaser());
         }
         public void Shoot(Canvas canvas)

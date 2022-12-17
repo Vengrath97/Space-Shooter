@@ -35,14 +35,12 @@ namespace Space_Shooter
         public MainWindow()
         {
             InitializeComponent();
-            SetupWindow();
             playerShip = new() { Model = player };
+            SetupWindow();
             gameTimer.Interval = TimeSpan.FromMilliseconds(GameTickLength);
             gameTimer.Tick += GameLoop;
             gameTimer.Start();
             MyCanvas.Focus();
-            Draw.DrawBackground(MyCanvas);
-            Draw.DrawPlayer(playerShip);
         }
         private void SetupWindow()
         {
@@ -52,6 +50,8 @@ namespace Space_Shooter
             MinHeight = GlobalVariables.WindowHeight;
             Height = GlobalVariables.WindowHeight;
             MaxHeight = GlobalVariables.WindowHeight;
+            Draw.DrawBackground(MyCanvas);
+            Draw.DrawPlayer(playerShip);
 
         }
         private void GameLoop(object sender, EventArgs e)
@@ -71,7 +71,7 @@ namespace Space_Shooter
             gameTimer.Tick -= GameLoop;
             scoreText.Content = "";
             damageText.Content = "";
-            gameOverText.Content = $"Captain, you have survived \nfor a long time.\nYou have scored {score} points";
+            gameOverText.Content = $"GAME OVER\nSCORE: {score}";
         }
         private void OnKeyDown(object sender, KeyEventArgs e)
         {

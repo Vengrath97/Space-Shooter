@@ -30,7 +30,7 @@ namespace Space_Shooter
         {
             foreach(Gun gun in Guns)
             {
-                gun.Fire(canvas, Model,false);
+                gun.Fire(canvas, Model, false);
             }
         }
 
