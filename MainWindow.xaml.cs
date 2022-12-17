@@ -1,16 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 
@@ -18,19 +12,19 @@ namespace Space_Shooter
 {
     public partial class MainWindow : Window
     {
-        private readonly List<Rectangle> itemRemover = new();
+        private int score;
+        private static List<Rectangle> itemRemover = new();
         public static List<Bullet> bullets = new();
         public static List<Bullet> bulletRemover = new();
+        private static List<EnemyShip> enemyShips = new();
+        private static List<EnemyShip> enemyShipsRemover = new();
         private readonly DispatcherTimer gameTimer = new();
         private readonly Random rand = new();
 
 
         private readonly int GameTickLength = 20;
-        private int SafetyPeriod = 50;
-        private int EnemySpawnRate = 50;
-        private int EnemyShipSpeed = 10;
-
-        private int score;
+        private readonly int EnemySpawnRate = 50;
+        private int SafetyPeriod = 0;
 
         private bool moveLeft;
         private bool moveRight;
@@ -68,6 +62,7 @@ namespace Space_Shooter
             AttemptToMovePlayer();
             MoveObjects();
             RemoveOutOfBounds();
+            ClearLists();
             if (playerShip.CurrentHullStrength < 1) GameOver();
 
         }
@@ -123,9 +118,10 @@ namespace Space_Shooter
         }
         private void MakeEnemies()
         {
+
             ImageBrush enemySprite = new();
-            int EnemySprite = rand.Next(0, 5);
-            enemySprite.ImageSource = new BitmapImage(new Uri(SpriteUri.EnemyShipX[EnemySprite], UriKind.Relative));
+            int SpriteID = rand.Next(0, 5);
+            enemySprite.ImageSource = new BitmapImage(new Uri(SpriteUri.EnemyShipX[SpriteID], UriKind.Relative));
             Rectangle newEnemy = new()
             {
                 Tag = "enemy",
@@ -134,8 +130,11 @@ namespace Space_Shooter
                 Fill = enemySprite
             };
 
-            Canvas.SetTop(newEnemy, -100);
-            Canvas.SetLeft(newEnemy, rand.Next(0, (int)(GlobalVariables.WindowWidth-newEnemy.Width)));
+            EnemyShip enemyShip = new() { Model = newEnemy };
+            enemyShips.Add(enemyShip);
+
+            Canvas.SetTop(enemyShip.Model, -100);
+            Canvas.SetLeft(enemyShip.Model, rand.Next(0, (int)(GlobalVariables.WindowWidth-enemyShip.Model.Width)));
 
             MyCanvas.Children.Add(newEnemy);
         }
@@ -147,7 +146,13 @@ namespace Space_Shooter
             }
             foreach (Bullet item in bulletRemover)
             {
+                MyCanvas.Children.Remove(item.Model);
                 bullets.Remove(item);
+            }
+            foreach (EnemyShip item in enemyShipsRemover)
+            {
+                MyCanvas.Children.Remove(item.Model);
+                enemyShips.Remove(item);
             }
         }
         private void MoveObjects()
@@ -155,44 +160,48 @@ namespace Space_Shooter
             foreach(Bullet bullet in bullets)
             {
                 bullet.Move();
-                if (Canvas.GetTop(bullet.Model) < 0)
+                if (Canvas.GetTop(bullet.Model) < 0 || Canvas.GetTop(bullet.Model) >= GlobalVariables.WindowHeight)
                 {
                     itemRemover.Add(bullet.Model);
                     bulletRemover.Add(bullet);
                 }
-                CheckForEnemyHits(bullet.Model);
+                CheckForEnemyHits(bullet);
             }
-            foreach (var x in MyCanvas.Children.OfType<Rectangle>())
+            foreach(EnemyShip ship in enemyShips)
             {
-                if ((string)x.Tag == "enemy")
+                ship.Move(DirectionDictionary.Direction.Down);
+                ship.Shoot(MyCanvas); 
+                if (!ship.IsThereSpaceDown())
                 {
-                    Canvas.SetTop(x, Canvas.GetTop(x) + EnemyShipSpeed);
-                    if (Canvas.GetTop(x) > GlobalVariables.WindowHeight)
-                    {
-                        itemRemover.Add(x);
-                        playerShip.CurrentHullStrength -= GlobalVariables.HullDamageWhenEnemyEscapes;
-                    }
+                    itemRemover.Add(ship.Model);
+                    enemyShipsRemover.Add(ship);
+                    playerShip.CurrentHullStrength -= GlobalVariables.HullDamageWhenEnemyEscapes;
                 }
             }
         }
-        private void CheckForEnemyHits(Rectangle bullet)
+        private void CheckForEnemyHits(Bullet bullet)
         {
-            Rect bulletHitBox = new(Canvas.GetLeft(bullet), Canvas.GetTop(bullet), bullet.Width, bullet.Height);
-            foreach (var enemy in MyCanvas.Children.OfType<Rectangle>())
+            Rectangle bulletModel = bullet.Model;
+            Rect bulletHitBox = new(Canvas.GetLeft(bulletModel), Canvas.GetTop(bulletModel), bulletModel.Width, bulletModel.Height);
+            foreach (EnemyShip ship in enemyShips)
             {
-                if ((string)enemy.Tag == "enemy")
+                Rect enemyHit = new(Canvas.GetLeft(ship.Model), Canvas.GetTop(ship.Model), ship.Model.Width, ship.Model.Height);
+                if (bulletHitBox.IntersectsWith(enemyHit) && !bullet.IsEnemy)
                 {
-                    Rect enemyHit = new(Canvas.GetLeft(enemy), Canvas.GetTop(enemy), enemy.Width, enemy.Height);
-
-                    if (bulletHitBox.IntersectsWith(enemyHit))
-                    {
-                        itemRemover.Add(bullet);
-                        itemRemover.Add(enemy);
-                        score += 10;
-                    }
+                    score += 10;
+                    itemRemover.Add(bullet.Model);
+                    bulletRemover.Add(bullet);
+                    itemRemover.Add(ship.Model);
+                    enemyShipsRemover.Add(ship);
                 }
             }
         }
+        private void ClearLists()
+        {
+            bulletRemover = new();
+            enemyShipsRemover = new();
+        }
+
         private void SpawnEnemies()
         {
             if (SafetyPeriod < 0)

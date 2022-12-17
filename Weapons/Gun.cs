@@ -10,7 +10,7 @@ namespace Space_Shooter
 {
     public class Gun
     {
-        public virtual void Fire(Canvas canvas, Rectangle model)
+        public virtual void Fire(Canvas canvas, Rectangle model, bool isEnemy=true)
         {
 
         }
