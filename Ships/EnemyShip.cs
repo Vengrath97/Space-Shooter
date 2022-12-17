@@ -11,7 +11,7 @@ namespace Space_Shooter
         public int CurrentHullStrength;
         public int Speed;
         public Rectangle Model;
-        private List<Gun> Guns = new();
+        private readonly List<Gun> Guns = new();
 
         public EnemyShip(int hullStrength = 1, int speed = 10)
         {
@@ -37,37 +37,37 @@ namespace Space_Shooter
             {
                 case DirectionDictionary.Direction.Left:
                     if (IsThereSpaceLeft())
-                        moveLeft();
+                        MoveLeft();
                     break;
                 case DirectionDictionary.Direction.Right:
                     if (IsThereSpaceRight())
-                        moveRight();
+                        MoveRight();
                     break;
                 case DirectionDictionary.Direction.Up:
                     if (IsThereSpaceUp())
-                        moveUp();
+                        MoveUp();
                     break;
                 case DirectionDictionary.Direction.Down:
                     if (IsThereSpaceDown())
-                        moveDown();
+                        MoveDown();
                     break;
                 default:
                     break;
             }
         }
-        private void moveLeft()
+        private void MoveLeft()
         {
             Canvas.SetLeft(Model, Canvas.GetLeft(Model) - this.Speed);
         }
-        private void moveRight()
+        private void MoveRight()
         {
             Canvas.SetLeft(Model, Canvas.GetLeft(Model) + this.Speed);
         }
-        private void moveUp()
+        private void MoveUp()
         {
             Canvas.SetTop(Model, Canvas.GetTop(Model) - this.Speed);
         }
-        private void moveDown()
+        private void MoveDown()
         {
             Canvas.SetTop(Model, Canvas.GetTop(Model) + this.Speed);
         }

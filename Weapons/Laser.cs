@@ -16,9 +16,9 @@ namespace Space_Shooter
                 int ySpeed = -25;
                 if (isEnemy)
                 {
-                    ySpeed = ySpeed * -1;
+                    ySpeed *= -1;
                 }
-                MainWindow.bullets.Add(CreateBullet(canvas, model, xSpeed, ySpeed));
+                MainWindow.bullets.Add(CreateBullet(canvas, model, xSpeed, ySpeed, false));
                 heat = 0;
             }
             heat += 1;
