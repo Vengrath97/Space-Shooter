@@ -12,32 +12,29 @@ namespace Space_Shooter
 {
     public partial class MainWindow : Window
     {
-        private int score;
-        private static List<Rectangle> itemRemover = new();
-        public static List<Bullet> bullets = new();
-        public static List<Bullet> bulletRemover = new();
-        private static List<EnemyShip> enemyShips = new();
-        private static List<EnemyShip> enemyShipsRemover = new();
+
+
         private readonly DispatcherTimer gameTimer = new();
         private readonly Random rand = new();
-
-
-        private readonly int GameTickLength = 20;
+        private readonly PlayerShipOnCanvas playerShipOnCanvas;
         private readonly int EnemySpawnRate = 50;
+        private int score = new();
         private int SafetyPeriod = 0;
 
         private bool moveLeft;
         private bool moveRight;
         private bool moveUp;
         private bool moveDown;
-        private readonly PlayerShip playerShip;
+
 
         public MainWindow()
         {
             InitializeComponent();
-            playerShip = new() { Model = player };
+            playerShipOnCanvas= new(MyCanvas, SpriteUri.Player, 56, 50);
+            playerShipOnCanvas.RepresentedShip = new PlayerShip();
+            playerShipOnCanvas.Draw();
             SetupWindow();
-            gameTimer.Interval = TimeSpan.FromMilliseconds(GameTickLength);
+            gameTimer.Interval = TimeSpan.FromMilliseconds(20);
             gameTimer.Tick += GameLoop;
             gameTimer.Start();
             MyCanvas.Focus();
@@ -51,7 +48,7 @@ namespace Space_Shooter
             Height = GlobalVariables.WindowHeight;
             MaxHeight = GlobalVariables.WindowHeight;
             Draw.DrawBackground(MyCanvas);
-            Draw.DrawPlayer(playerShip);
+            //Draw.DrawPlayer(playerShip);
 
         }
         private void GameLoop(object sender, EventArgs e)
@@ -59,11 +56,8 @@ namespace Space_Shooter
             SafetyPeriod -= 1;
             UpdateLabels();
             SpawnEnemies();
-            AttemptToMovePlayer();
             MoveObjects();
-            RemoveOutOfBounds();
-            ClearLists();
-            if (playerShip.CurrentHullStrength < 1) GameOver();
+            if (playerShipOnCanvas.RepresentedShip.Hull < 1) GameOver();
 
         }
         private void GameOver()
@@ -93,7 +87,7 @@ namespace Space_Shooter
             }
             if (e.Key == Key.Space)
             {
-                playerShip.Shoot(MyCanvas);
+                playerShipOnCanvas.Shoot();
             }
         }
         private void OnKeyUp(object sender, KeyEventArgs e)
@@ -116,92 +110,6 @@ namespace Space_Shooter
             }
 
         }
-        private void MakeEnemies()
-        {
-
-            ImageBrush enemySprite = new();
-            int SpriteID = rand.Next(0, 5);
-            enemySprite.ImageSource = new BitmapImage(new Uri(SpriteUri.EnemyShipX[SpriteID], UriKind.Relative));
-            Rectangle newEnemy = new()
-            {
-                Tag = "enemy",
-                Height = 50,
-                Width = 56,
-                Fill = enemySprite
-            };
-
-            EnemyShip enemyShip = new() { Model = newEnemy };
-            enemyShips.Add(enemyShip);
-
-            Canvas.SetTop(enemyShip.Model, -100);
-            Canvas.SetLeft(enemyShip.Model, rand.Next(0, (int)(GlobalVariables.WindowWidth-enemyShip.Model.Width)));
-
-            MyCanvas.Children.Add(newEnemy);
-        }
-        private void RemoveOutOfBounds()
-        {
-            foreach (Rectangle item in itemRemover)
-            {
-                MyCanvas.Children.Remove(item);
-            }
-            foreach (Bullet item in bulletRemover)
-            {
-                MyCanvas.Children.Remove(item.Model);
-                bullets.Remove(item);
-            }
-            foreach (EnemyShip item in enemyShipsRemover)
-            {
-                MyCanvas.Children.Remove(item.Model);
-                enemyShips.Remove(item);
-            }
-        }
-        private void MoveObjects()
-        {
-            foreach(Bullet bullet in bullets)
-            {
-                bullet.Move();
-                if (Canvas.GetTop(bullet.Model) < 0 || Canvas.GetTop(bullet.Model) >= GlobalVariables.WindowHeight)
-                {
-                    itemRemover.Add(bullet.Model);
-                    bulletRemover.Add(bullet);
-                }
-                CheckForEnemyHits(bullet);
-            }
-            foreach(EnemyShip ship in enemyShips)
-            {
-                ship.Move(DirectionDictionary.Direction.Down);
-                ship.Shoot(MyCanvas); 
-                if (!ship.IsThereSpaceDown())
-                {
-                    itemRemover.Add(ship.Model);
-                    enemyShipsRemover.Add(ship);
-                    playerShip.CurrentHullStrength -= GlobalVariables.HullDamageWhenEnemyEscapes;
-                }
-            }
-        }
-        private void CheckForEnemyHits(Bullet bullet)
-        {
-            Rectangle bulletModel = bullet.Model;
-            Rect bulletHitBox = new(Canvas.GetLeft(bulletModel), Canvas.GetTop(bulletModel), bulletModel.Width, bulletModel.Height);
-            foreach (EnemyShip ship in enemyShips)
-            {
-                Rect enemyHit = new(Canvas.GetLeft(ship.Model), Canvas.GetTop(ship.Model), ship.Model.Width, ship.Model.Height);
-                if (bulletHitBox.IntersectsWith(enemyHit) && !bullet.IsEnemy)
-                {
-                    score += 10;
-                    itemRemover.Add(bullet.Model);
-                    bulletRemover.Add(bullet);
-                    itemRemover.Add(ship.Model);
-                    enemyShipsRemover.Add(ship);
-                }
-            }
-        }
-        private void ClearLists()
-        {
-            bulletRemover = new();
-            enemyShipsRemover = new();
-        }
-
         private void SpawnEnemies()
         {
             if (SafetyPeriod < 0)
@@ -210,29 +118,40 @@ namespace Space_Shooter
                 SafetyPeriod += EnemySpawnRate;
             }
         }
+        private void MakeEnemies()
+        {
+            string uri = SpriteUri.EnemyShipX[(int)rand.Next(0, 5)];
+            ShipOnCanvas enemyShip = new(MyCanvas, uri);
+            enemyShip.SpeedXOffset = 0;
+            enemyShip.SpeedYOffset = 10;
+            enemyShip.Draw();
+        }
+        private void MoveObjects()
+        {
+            foreach(ObjectOnCanvas canvasItem in ObjectOnCanvas.CanvasItems)
+            {
+                if (canvasItem is PlayerShipOnCanvas)
+                {
+                    DirectionDictionary.Direction xAxis = (moveLeft || moveRight) ? (moveLeft ? DirectionDictionary.Direction.Left : DirectionDictionary.Direction.Right) : DirectionDictionary.Direction.Unknown;
+                    
+                    DirectionDictionary.Direction yAxis = (moveUp || moveDown) ? (moveUp ? DirectionDictionary.Direction.Up : DirectionDictionary.Direction.Down) : DirectionDictionary.Direction.Unknown;
+
+                    canvasItem.Move(xAxis, yAxis);
+                }
+                else
+                {
+                    canvasItem.Move();
+                }
+                if (canvasItem is BulletOnCanvas)
+                {
+                    canvasItem.CheckForCollision();
+                }
+            }
+        }
         private void UpdateLabels()
         {
             scoreText.Content = "Score: " + score;
-            damageText.Content = "Hull: " + playerShip.CurrentHullStrength;
-        }
-        private void AttemptToMovePlayer()
-        {
-            if (moveLeft)
-            {
-                playerShip.Move(DirectionDictionary.Direction.Left);
-            }
-            if (moveRight)
-            {
-                playerShip.Move(DirectionDictionary.Direction.Right);
-            }
-            if (moveUp)
-            {
-                playerShip.Move(DirectionDictionary.Direction.Up);
-            }
-            if (moveDown)
-            {
-                playerShip.Move(DirectionDictionary.Direction.Down);
-            }
+            damageText.Content = "Hull: " + playerShipOnCanvas.RepresentedShip.Hull;
         }
     }
 }
