@@ -9,7 +9,7 @@ namespace Space_Shooter
     abstract class Gun
     {
 
-        public void Fire()
+        public virtual void Fire(double height, double width)
         {
 
         }

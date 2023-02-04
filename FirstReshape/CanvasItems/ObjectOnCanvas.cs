@@ -27,7 +27,7 @@ namespace Space_Shooter
         internal static Random rand = new();
         public static List<ObjectOnCanvas> CanvasItems = new();
 
-        public ObjectOnCanvas(Canvas canvas, string uri, int height = 50, int width = 56, double speedXoffset = 0, double speedYoffset = -10)
+        public ObjectOnCanvas(Canvas canvas, string uri = "", int height = 50, int width = 56, double speedXoffset = 0, double speedYoffset = -10)
         {
             Canvas = canvas;
             Height = height;
@@ -36,7 +36,10 @@ namespace Space_Shooter
             SpeedYOffset = speedYoffset;
             ImageBrush enemySprite = new();
             GraphicUri = uri;
-            enemySprite.ImageSource = new BitmapImage(new Uri(GraphicUri, UriKind.Relative));
+            if (uri!="")
+            {
+                enemySprite.ImageSource = new BitmapImage(new Uri(GraphicUri, UriKind.Relative));
+            }
 
             CanvasItem = new()
             {
@@ -54,17 +57,25 @@ namespace Space_Shooter
             if(!isDrawn)
             {
                 SpawnWidth = rand.Next(0, (int)(GlobalVariables.WindowWidth - Width));
-                Canvas.SetTop(CanvasItem, 0 - Height);
-                //Canvas.SetTop(CanvasItem, 100); //debug value
+                Canvas.SetTop(CanvasItem, 1);
                 Canvas.SetLeft(CanvasItem, SpawnWidth);
                 Canvas.Children.Add(CanvasItem);
                 isDrawn = true;
             }
         }
+        public virtual void Draw(double height, double width)
+        {
+
+        }
         public virtual void Move()
         {
-            Canvas.SetLeft(CanvasItem, Canvas.GetLeft(CanvasItem) + SpeedXOffset);
-            Canvas.SetTop(CanvasItem, Canvas.GetTop(CanvasItem) + SpeedYOffset);
+            double newWidth = Canvas.GetLeft(CanvasItem) + SpeedXOffset;
+            if (newWidth >= 0 && newWidth<=GlobalVariables.WindowWidth - Width)
+            Canvas.SetLeft(CanvasItem, newWidth);
+
+            double newHeight = Canvas.GetTop(CanvasItem) + SpeedYOffset;
+            if ( newHeight >= 0 && newHeight <= GlobalVariables.WindowHeight - Height)
+                Canvas.SetTop(CanvasItem, newHeight);
         }
         public virtual void Move(DirectionDictionary.Direction xAxis, DirectionDictionary.Direction yAxis)
         {
@@ -80,7 +91,7 @@ namespace Space_Shooter
             
         }
 
-        public virtual ShipOnCanvas CheckForCollision()
+        public virtual ObjectOnCanvas CheckForCollision()
         {
             return null;
         }
