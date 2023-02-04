@@ -19,7 +19,8 @@ namespace Space_Shooter
         {
             foreach(Gun gun in RepresentedShip.Guns)
             {
-                gun.Fire();
+                //gun.Fire(Canvas.GetTop(CanvasItem), Canvas.GetLeft(CanvasItem));
+                gun.Fire(200,200);
             }
         }
 

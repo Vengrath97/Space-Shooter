@@ -18,7 +18,7 @@ namespace Space_Shooter
         private readonly Random rand = new();
         private readonly PlayerShipOnCanvas playerShipOnCanvas;
         private readonly int EnemySpawnRate = 50;
-        private int score = new();
+        private readonly int score = new();
         private int SafetyPeriod = 0;
 
         private bool moveLeft;
@@ -32,9 +32,11 @@ namespace Space_Shooter
             InitializeComponent();
             playerShipOnCanvas= new(MyCanvas, SpriteUri.Player, 56, 50);
             playerShipOnCanvas.RepresentedShip = new PlayerShip();
+            BasicLaser StarterGun = new(MyCanvas);
+            playerShipOnCanvas.RepresentedShip.Guns.Add(StarterGun);
             playerShipOnCanvas.Draw();
             SetupWindow();
-            gameTimer.Interval = TimeSpan.FromMilliseconds(20);
+            gameTimer.Interval = TimeSpan.FromMilliseconds(15);
             gameTimer.Tick += GameLoop;
             gameTimer.Start();
             MyCanvas.Focus();
@@ -48,7 +50,6 @@ namespace Space_Shooter
             Height = GlobalVariables.WindowHeight;
             MaxHeight = GlobalVariables.WindowHeight;
             Draw.DrawBackground(MyCanvas);
-            //Draw.DrawPlayer(playerShip);
 
         }
         private void GameLoop(object sender, EventArgs e)
