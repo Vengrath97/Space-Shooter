@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
+using Space_Shooter.Storage;
 
 namespace Space_Shooter
 {
@@ -12,7 +8,7 @@ namespace Space_Shooter
     {
         public Bullet RepresentedBullet;
 
-        public BulletOnCanvas(Bullet bullet, Canvas canvas, string uri="", int height = 20, int width = 20) : base(canvas, uri, height, width)
+        public BulletOnCanvas(Bullet bullet, Canvas canvas, string uri = "", int height = 20, int width = 20) : base(canvas, uri, height, width)
         {
             RepresentedBullet = bullet;
         }
@@ -26,27 +22,21 @@ namespace Space_Shooter
                 isDrawn = true;
             }
         }
-        public override ObjectOnCanvas CheckForCollision()
+        public override CollisionData CheckForCollision()
         {
-            foreach (ObjectOnCanvas enemyShip in ObjectOnCanvas.CanvasItems)
+            foreach (ObjectOnCanvas objectOnCanvas in CanvasItems)
             {
-                if (!(enemyShip is PlayerShipOnCanvas || enemyShip is PowerUpOnCanvas || enemyShip is BulletOnCanvas))
+                if (objectOnCanvas is ShipOnCanvas && objectOnCanvas is not PlayerShipOnCanvas)
                 {
-                    Rect enemyHitbox = new(Canvas.GetLeft(enemyShip.CanvasItem), Canvas.GetTop(enemyShip.CanvasItem), enemyShip.CanvasItem.Width, enemyShip.CanvasItem.Height);
-                    if (Hitbox.IntersectsWith(enemyHitbox))
+                    //nie mam pojęcia, dlaczego to nie działa.
+                    //
+                    Rect firstObjectHitbox = GetGitbox();
+                    Rect enemyShipHitbox = objectOnCanvas.GetGitbox();
+                    if (firstObjectHitbox.IntersectsWith(enemyShipHitbox))
                     {
-                        return enemyShip;
+                        return new CollisionData(this, objectOnCanvas);
                     }
                 }
-                    /*
-                if (!(enemyShip.RepresentedShip is PlayerShip))
-                    {
-                        Rect enemyHitbox = new(Canvas.GetLeft(enemyShip.CanvasItem), Canvas.GetTop(enemyShip.CanvasItem), enemyShip.CanvasItem.Width, enemyShip.CanvasItem.Height);
-                        if (Hitbox.IntersectsWith(enemyShip.Hitbox))
-                        {
-                            return enemyShip;
-                        }
-                    }*/
             }
             return null;
         }

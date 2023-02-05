@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Controls;
+﻿using System.Windows.Controls;
 
 namespace Space_Shooter
 {
@@ -16,8 +11,8 @@ namespace Space_Shooter
         }
         public override void Fire(double height, double width)
         {
-            BulletOnCanvas y = new(new(), canvas);
-            y.Draw(height, width);
+            BulletOnCanvas bullet = new(new(), canvas);
+            bullet.Draw(height, width);
         }
 
     }
