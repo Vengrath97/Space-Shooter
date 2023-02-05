@@ -71,10 +71,10 @@ namespace Space_Shooter
         {
             double newWidth = Canvas.GetLeft(CanvasItem) + SpeedXOffset;
             if (newWidth >= 0 && newWidth<=GlobalVariables.WindowWidth - Width)
-            Canvas.SetLeft(CanvasItem, newWidth);
+                Canvas.SetLeft(CanvasItem, newWidth);
 
             double newHeight = Canvas.GetTop(CanvasItem) + SpeedYOffset;
-            if ( newHeight >= 0 && newHeight <= GlobalVariables.WindowHeight - Height)
+            if ( newHeight >= 0 && newHeight <= GlobalVariables.WindowHeight)
                 Canvas.SetTop(CanvasItem, newHeight);
         }
         public virtual void Move(DirectionDictionary.Direction xAxis, DirectionDictionary.Direction yAxis)

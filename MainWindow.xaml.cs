@@ -16,7 +16,8 @@ namespace Space_Shooter
 
         private readonly DispatcherTimer gameTimer = new();
         private readonly Random rand = new();
-        private readonly PlayerShipOnCanvas playerShipOnCanvas;
+        private  PlayerShipOnCanvas playerShipOnCanvas;
+        private List<ObjectOnCanvas> removalList = new();
         private readonly int EnemySpawnRate = 50;
         private readonly int score = new();
         private int SafetyPeriod = 0;
@@ -30,11 +31,7 @@ namespace Space_Shooter
         public MainWindow()
         {
             InitializeComponent();
-            playerShipOnCanvas= new(MyCanvas, SpriteUri.Player, 56, 50);
-            playerShipOnCanvas.RepresentedShip = new PlayerShip();
-            BasicLaser StarterGun = new(MyCanvas);
-            playerShipOnCanvas.RepresentedShip.Guns.Add(StarterGun);
-            playerShipOnCanvas.Draw();
+            InitializePlayerShip();
             SetupWindow();
             gameTimer.Interval = TimeSpan.FromMilliseconds(15);
             gameTimer.Tick += GameLoop;
@@ -58,6 +55,7 @@ namespace Space_Shooter
             UpdateLabels();
             SpawnEnemies();
             MoveObjects();
+            MarkForRemoval();
             if (playerShipOnCanvas.RepresentedShip.Hull < 1) GameOver();
 
         }
@@ -153,6 +151,30 @@ namespace Space_Shooter
         {
             scoreText.Content = "Score: " + score;
             damageText.Content = "Hull: " + playerShipOnCanvas.RepresentedShip.Hull;
+        }
+        private void MarkForRemoval()
+        {
+            foreach (ObjectOnCanvas canvasItem in ObjectOnCanvas.CanvasItems)
+            {
+                if (Canvas.GetTop(canvasItem.CanvasItem) >= GlobalVariables.WindowHeight-1)
+                {
+                    removalList.Add(canvasItem);
+                }
+            }
+            foreach (ObjectOnCanvas toRemove in removalList)
+            {
+                toRemove.Dispose();
+            }
+        }
+        private void InitializePlayerShip()
+        {
+            playerShipOnCanvas = new(MyCanvas, SpriteUri.Player, 56, 50);
+            playerShipOnCanvas.RepresentedShip = new PlayerShip();
+
+            BasicLaser StarterGun = new(MyCanvas);
+            playerShipOnCanvas.RepresentedShip.Guns.Add(StarterGun);
+
+            playerShipOnCanvas.Draw();
         }
     }
 }
