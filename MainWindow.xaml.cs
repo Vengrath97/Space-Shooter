@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using System.Windows.Threading;
+using Space_Shooter.Storage;
 
 namespace Space_Shooter
 {
@@ -14,26 +12,25 @@ namespace Space_Shooter
     {
 
 
+        private PlayerShipOnCanvas playerShipOnCanvas;
         private readonly DispatcherTimer gameTimer = new();
         private readonly Random rand = new();
-        private  PlayerShipOnCanvas playerShipOnCanvas;
-        private List<ObjectOnCanvas> removalList = new();
+        private readonly List<ObjectOnCanvas> removalList = new();
         private readonly int EnemySpawnRate = 50;
         private readonly int score = new();
         private int SafetyPeriod = 0;
-
+        private CollisionData collisionData;
         private bool moveLeft;
         private bool moveRight;
         private bool moveUp;
         private bool moveDown;
-
 
         public MainWindow()
         {
             InitializeComponent();
             InitializePlayerShip();
             SetupWindow();
-            gameTimer.Interval = TimeSpan.FromMilliseconds(15);
+            gameTimer.Interval = TimeSpan.FromMilliseconds(20);
             gameTimer.Tick += GameLoop;
             gameTimer.Start();
             MyCanvas.Focus();
@@ -143,7 +140,13 @@ namespace Space_Shooter
                 }
                 if (canvasItem is BulletOnCanvas)
                 {
-                    canvasItem.CheckForCollision();
+                    collisionData = canvasItem.CheckForCollision();
+                    if (collisionData is not null)
+                    {
+                        removalList.Add(collisionData.Object1);
+                        removalList.Add(collisionData.Object2);
+                        collisionData = null;
+                    }
                 }
             }
         }
@@ -156,13 +159,18 @@ namespace Space_Shooter
         {
             foreach (ObjectOnCanvas canvasItem in ObjectOnCanvas.CanvasItems)
             {
-                if (Canvas.GetTop(canvasItem.CanvasItem) >= GlobalVariables.WindowHeight-1)
+                if (Canvas.GetTop(canvasItem.CanvasItem) >= GlobalVariables.WindowHeight-canvasItem.CanvasItem.Height)
+                {
+                    removalList.Add(canvasItem);
+                }
+                if (Canvas.GetTop(canvasItem.CanvasItem) <= 10 && canvasItem is BulletOnCanvas)
                 {
                     removalList.Add(canvasItem);
                 }
             }
             foreach (ObjectOnCanvas toRemove in removalList)
             {
+                if (toRemove is not PlayerShipOnCanvas)
                 toRemove.Dispose();
             }
         }

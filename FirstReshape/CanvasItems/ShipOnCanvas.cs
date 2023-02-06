@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Controls;
+﻿using System.Windows.Controls;
 
 namespace Space_Shooter
 {
@@ -19,8 +14,7 @@ namespace Space_Shooter
         {
             foreach(Gun gun in RepresentedShip.Guns)
             {
-                //gun.Fire(Canvas.GetTop(CanvasItem), Canvas.GetLeft(CanvasItem));
-                gun.Fire(200,200);
+                gun.Fire(Canvas.GetTop(CanvasItem), Canvas.GetLeft(CanvasItem));
             }
         }
 

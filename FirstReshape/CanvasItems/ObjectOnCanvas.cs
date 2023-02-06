@@ -1,20 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using Space_Shooter.Storage;
 
 namespace Space_Shooter
 {
     abstract class ObjectOnCanvas
     {
         public Rectangle CanvasItem;
-        public Rect Hitbox;
         public string GraphicUri;
         public double SpeedXOffset;
         public double SpeedYOffset;
@@ -22,11 +19,15 @@ namespace Space_Shooter
         internal int Width;
         public int SpawnWidth;
         internal bool isDrawn;
-
+        
         internal readonly Canvas Canvas;
         internal static Random rand = new();
         public static List<ObjectOnCanvas> CanvasItems = new();
 
+        public Rect GetGitbox()
+        {
+            return new Rect(Canvas.GetLeft(CanvasItem), Canvas.GetTop(CanvasItem), CanvasItem.Width, CanvasItem.Height);
+        }
         public ObjectOnCanvas(Canvas canvas, string uri = "", int height = 50, int width = 56, double speedXoffset = 0, double speedYoffset = -10)
         {
             Canvas = canvas;
@@ -36,9 +37,13 @@ namespace Space_Shooter
             SpeedYOffset = speedYoffset;
             ImageBrush enemySprite = new();
             GraphicUri = uri;
-            if (uri!="")
+            if (uri != "")
             {
                 enemySprite.ImageSource = new BitmapImage(new Uri(GraphicUri, UriKind.Relative));
+            }
+            else
+            {
+                enemySprite.ImageSource = new BitmapImage(new Uri(SpriteUri.Player, UriKind.Relative));
             }
 
             CanvasItem = new()
@@ -47,7 +52,6 @@ namespace Space_Shooter
                 Width = Width,
                 Fill = enemySprite
             };
-            Hitbox = new(Canvas.GetLeft(CanvasItem), Canvas.GetTop(CanvasItem), CanvasItem.Width, CanvasItem.Height);
             CanvasItems.Add(this);
 
         }
@@ -91,7 +95,7 @@ namespace Space_Shooter
             
         }
 
-        public virtual ObjectOnCanvas CheckForCollision()
+        public virtual CollisionData CheckForCollision()
         {
             return null;
         }
