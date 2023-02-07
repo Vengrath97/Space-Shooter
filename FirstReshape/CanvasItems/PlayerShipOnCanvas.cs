@@ -47,5 +47,9 @@ namespace Space_Shooter
                 isDrawn = true;
             }
         }
+        public override void OnCollision(int damage)
+        {
+            RepresentedShip.TakeDamage(damage);
+        }
     }
 }

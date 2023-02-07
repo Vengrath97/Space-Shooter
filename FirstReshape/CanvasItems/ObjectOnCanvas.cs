@@ -24,7 +24,7 @@ namespace Space_Shooter
         internal static Random rand = new();
         public static List<ObjectOnCanvas> CanvasItems = new();
 
-        public Rect GetGitbox()
+        public Rect GetHitbox()
         {
             return new Rect(Canvas.GetLeft(CanvasItem), Canvas.GetTop(CanvasItem), CanvasItem.Width, CanvasItem.Height);
         }
@@ -90,7 +90,7 @@ namespace Space_Shooter
             Canvas.Children.Remove(CanvasItem);
             CanvasItems.Remove(this);
         }
-        public virtual void OnCollision()
+        public virtual void OnCollision(int damage)
         {
             
         }
@@ -98,6 +98,9 @@ namespace Space_Shooter
         public virtual CollisionData CheckForCollision()
         {
             return null;
+        }
+        public virtual void Shoot()
+        {
         }
     }
 }

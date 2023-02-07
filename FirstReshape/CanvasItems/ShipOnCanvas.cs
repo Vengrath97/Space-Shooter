@@ -10,11 +10,11 @@ namespace Space_Shooter
         {
             RepresentedShip = new EnemyShip();
         }
-        public virtual void Shoot()
+        public override void Shoot()
         {
             foreach(Gun gun in RepresentedShip.Guns)
             {
-                gun.Fire(Canvas.GetTop(CanvasItem), Canvas.GetLeft(CanvasItem));
+                gun.Fire(Canvas.GetTop(CanvasItem), (Canvas.GetLeft(CanvasItem)+ Canvas.GetLeft(CanvasItem))/2);
             }
         }
 

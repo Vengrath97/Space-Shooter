@@ -26,12 +26,10 @@ namespace Space_Shooter
         {
             foreach (ObjectOnCanvas objectOnCanvas in CanvasItems)
             {
-                if (objectOnCanvas is ShipOnCanvas && objectOnCanvas is not PlayerShipOnCanvas)
+                if (objectOnCanvas is ShipOnCanvas)
                 {
-                    //nie mam pojęcia, dlaczego to nie działa.
-                    //
-                    Rect firstObjectHitbox = GetGitbox();
-                    Rect enemyShipHitbox = objectOnCanvas.GetGitbox();
+                    Rect firstObjectHitbox = GetHitbox();
+                    Rect enemyShipHitbox = objectOnCanvas.GetHitbox();
                     if (firstObjectHitbox.IntersectsWith(enemyShipHitbox))
                     {
                         return new CollisionData(this, objectOnCanvas);
